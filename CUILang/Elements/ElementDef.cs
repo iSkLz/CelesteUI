@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 /*
  * CelesteUI language library
  * Element definition implementation
  * 
  * Author: SkLz
- * Last edit: 20/06/2021
+ * Last edit: 26/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -15,44 +16,98 @@ namespace Celeste.Mod.CelesteUI
     /// Describes a CUI element and exposes functionality to instantiate it.
     /// </summary>
     /// <remarks>
-    /// This class is written generically to cover all the needs of most typical elements. If custom behavior is needed, inherit the class and override the methods.
+    /// This class is written generically to cover the needs of a typical element.
+    /// If custom behavior is needed, inherit the class and override the methods.
     /// </remarks>
-    public class CUIElementDefinition
+    public class CuiElementDefinition
     {
         /// <summary>
-        /// Contains the types for element contrsuctors
+        /// References the property <see cref="CuiElement.Document"/>.
         /// </summary>
-        private static readonly Type[] ConstructorParentTypes = new Type[]
-        {
-            typeof(CUIElement), typeof(List<CUIAttribute>)
-        };
+        protected static readonly PropertyInfo ElementDocumentField = typeof(CuiElement).GetProperty("Document");
 
-        private static readonly Type[] ConstructorDocumentTypes = new Type[]
-        {
-            typeof(CUIDocument), typeof(List<CUIAttribute>)
-        };
+        /// <summary>
+        /// References the property <see cref="CuiElement.Parent"/>.
+        /// </summary>
+        protected static readonly PropertyInfo ElementParentField = typeof(CuiElement).GetProperty("Parent");
 
+        /// <summary>
+        /// References the property <see cref="CuiElement.Children"/>.
+        /// </summary>
+        protected static readonly PropertyInfo ElementChildrenField = typeof(CuiElement).GetProperty("Children");
+
+        /// <summary>
+        /// Represents the type of the element of this definition.
+        /// </summary>
+        public readonly Type ElementType;
+
+        /// <summary>
+        /// Represents the name of the XML element of this definition.
+        /// </summary>
         public readonly string Name;
-        protected readonly List<CUIAttributeDefinition> Attributes = new List<CUIAttributeDefinition>();
 
-        public IEnumerable<CUIAttributeDefinition> GetAttributes()
+        /// <summary>
+        /// Contains the attributes of the element of this definition.
+        /// </summary>
+        protected readonly List<CuiAttributeDefinition> Attributes = new List<CuiAttributeDefinition>();
+
+        public IEnumerable<CuiAttributeDefinition> GetAttributes()
         {
             // Fun fact: (List<CUIAttribute>)Def.GetAttributes() allows you to bypass this middleware function.
             return Attributes;
         }
 
-        public CUIElementDefinition(string name)
+        /// <summary>
+        /// Constructs an element definition with the specified name and for the specified element type.
+        /// </summary>
+        /// <typeparam name="TElement">The element type</typeparam>
+        /// <param name="name">The definition's XML element name</param>
+        /// <returns>The resultant definition.</returns>
+        public static CuiElementDefinition CreateDefinition<TElement>(string name)
+            => new CuiElementDefinition(name, typeof(TElement));
+
+        /// <summary>
+        /// Constructs an element definition with the specified name and for the specified element type.
+        /// </summary>
+        /// <param name="name">The definition's XML element name</param>
+        /// <param name="elementType">The element type</typeparam>
+        public CuiElementDefinition(string name, Type elementType) : this(name)
+        {
+            if (elementType == null)
+                elementType = typeof(CuiElement);
+
+            if (!elementType.InheritsFrom<CuiElement>())
+                throw new ArgumentException("The element type doesn't derive from CUIElement.", nameof(elementType));
+
+            ElementType = elementType;
+        }
+
+        /// <summary>
+        /// Constructs an element definition with the specified name.
+        /// </summary>
+        protected CuiElementDefinition(string name)
         {
             if ((Name = name) == null)
                 throw new ArgumentNullException(nameof(name), "Null element name.");
+
+            // ID attribute is present on all elements
+            DefineAttribute(CuiCommonLibrary.ID);
         }
 
-        public virtual void DefineAttribute(CUIAttributeDefinition definition)
+        /// <summary>
+        /// Adds an attribute to the definition
+        /// </summary>
+        /// <param name="definition">The attribute to add</param>
+        public virtual void DefineAttribute(CuiAttributeDefinition definition)
         {
             Attributes.Add(definition);
         }
 
-        public virtual void DefineAttributes(params CUIAttributeDefinition[] definitions)
+        /// <summary>
+        /// Adds a list of attributes to the definition
+        /// </summary>
+        /// <param name="definitions">The attributes to add</param>
+        public virtual void DefineAttributes(params CuiAttributeDefinition[] definitions)
         {
             foreach (var definition in definitions)
             {
@@ -63,38 +118,44 @@ namespace Celeste.Mod.CelesteUI
         /// <summary>
         /// Parses the markup of an element into an instance.
         /// </summary>
-        /// <remarks>
-        /// Custom element types passed to <typeparamref name="T"/> must provide a constructor that corresponds to one of the two <see cref="CUIElement"/> constructors with a <see cref="List{T}"/> of attributes.
-        /// The appropriate constructor (depending on the context) is located and invoked.
-        /// </remarks>
-        /// <typeparam name="T">Type of the element to construct.</typeparam>
-        /// <param name="info">Information of the element.</param>
+        /// <param name="info">Information of the element</param>
         /// <returns>The resultant CUI element</returns>
-        public virtual T Parse<T>(CUIElementInfo info) where T : CUIElement
+        public virtual CuiElement Parse(CuiParsingContext info)
         {
-            // Parse attributes
-            var attributes = new List<CUIAttribute>();
+            var attributes = new CuiAttributesCollection(ParseAttributes(info));
+            var element = CreateElement(attributes, info);
+            info.ParseChildren(element);
+            return element;
+        }
+
+        /// <summary>
+        /// Enumerates the definition's attributes and parses them one by one.
+        /// </summary>
+        /// <param name="info">Information of the element</param>
+        /// <returns>An iterator that parses an attribute definition and returns the result on each iteration.</returns>
+        protected virtual IEnumerable<CuiAttribute> ParseAttributes(CuiParsingContext info)
+        {
             foreach (var attr in Attributes)
             {
-                attributes.Add(attr.Parse(info));
+                yield return attr.Parse(info);
             }
+        }
 
-            // Construct the element (invoke constructor via reflection)
-            var args = new object[]
-            {
-                info.Parent ?? (object)info.Document,
-                attributes
-            };
-            var ctor = info.Parent != null
-                ? typeof(T).GetConstructor(ConstructorParentTypes)
-                : typeof(T).GetConstructor(ConstructorDocumentTypes);
-            T element = (T)ctor.Invoke(args);
+        /// <summary>
+        /// Creates an element instance with the specified attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes to pass</param>
+        /// <param name="info">Information of the element</param>
+        /// <returns>The resultant CUI element</returns>
+        protected virtual CuiElement CreateElement(CuiAttributesCollection attributes, CuiParsingContext info)
+        {
+            // Invoke the constructor
+            var element = (CuiElement)Activator.CreateInstance(ElementType, attributes);
 
-            // Initialize
-            foreach (var attr in attributes)
-            {
-                attr.AssignOwner(element);
-            }
+            // Initialize attributes
+            attributes.AssignOwner(element);
+
+            // Initialize the element
             element.Initialize();
 
             return element;

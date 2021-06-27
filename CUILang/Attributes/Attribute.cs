@@ -6,15 +6,15 @@ using System.Collections.Generic;
  * Attribute implementation
  * 
  * Author: SkLz
- * Last edit: 19/06/2021
+ * Last edit: 26/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
 {
     /// <summary>
-    /// Represents a CUI element attribute
+    /// Represents a CUI element attribute.
     /// </summary>
-    public class CUIAttribute
+    public partial class CuiAttribute
     {
         /// <summary>
         /// Represents the value assigned to the attribute.
@@ -35,7 +35,7 @@ namespace Celeste.Mod.CelesteUI
         /// </summary>
         /// <remarks>
         /// This is automatically assigned to by the constructor.
-        /// Set or override <see cref="Value"/> to change the value retrieving mechanism.
+        /// Override <see cref="Value"/> to change the value retrieving mechanism.
         /// </remarks>
         protected Func<object> GetValue;
 
@@ -48,27 +48,36 @@ namespace Celeste.Mod.CelesteUI
         /// <value>
         /// The stage of the attribute
         /// </value>
-        public CUIStage Stage { get; protected set; } = CUIStage.Activation;
+        public CuiStage Stage { get; protected set; } = CuiStage.Activation;
 
         /// <summary>
         /// Represents the owner of the attribute.
         /// </summary>
         /// <remarks>
-        /// Use <see cref="AssignOwner(CUIElement)"/> to assign the owner if needed.
+        /// Use <see cref="AssignOwner(CuiElement)"/> to assign the owner if needed.
         /// </remarks>
         /// <value>
         /// The owner element.
         /// </value>
-        public CUIElement Owner { get; protected set; }
+        public CuiElement Owner { get; protected internal set; }
+
+        /// <summary>
+        /// Represents the name of the attribute.
+        /// </summary>
+        /// <value>
+        /// The attribute's name.
+        /// </value>
+        public virtual string Name { get; protected set; }
 
         /// <summary>
         /// Constructs an attribute with a constant value.
         /// </summary>
         /// <param name="value">The value of the attribute</param>
-        public CUIAttribute(object value)
+        public CuiAttribute(string name, object value)
         {
             GetValue = () => value;
-            Stage = CUIStage.Creation;
+            Stage = CuiStage.Creation;
+            Name = name;
         }
 
         /// <summary>
@@ -76,10 +85,10 @@ namespace Celeste.Mod.CelesteUI
         /// </summary>
         /// <param name="macros">The list of the macros from the innermost to the outermost</param>
         /// <param name="expression">The expression inside the innermost macro</param>
-        public CUIAttribute(List<ICUIMacro> macros, string expression)
+        public CuiAttribute(string name, IEnumerable<ICuiMacro> macros, string expression)
         {
             // The latest stage is the attribute's stage
-            Stage = CUIStage.Creation;
+            Stage = CuiStage.Creation;
             foreach (var macro in macros)
             {
                 if (macro.Stage > Stage) Stage = macro.Stage;
@@ -91,6 +100,7 @@ namespace Celeste.Mod.CelesteUI
                 object value = expression;
                 return macros.WalkThrough<object, string>(expression, Owner);
             };
+            Name = name;
         }
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace Celeste.Mod.CelesteUI
         /// </summary>
         /// <param name="owner">The owner element</param>
         /// <exception cref="InvalidOperationException" />
-        public void AssignOwner(CUIElement owner)
+        public void AssignOwner(CuiElement owner)
         {
             Owner = (Owner == null)
                 ? owner

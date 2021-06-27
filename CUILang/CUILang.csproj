@@ -36,17 +36,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Macro.cs" />
+    <Compile Include="Attributes\AttributeDef.cs" />
+    <Compile Include="Attributes\AttributesCollection.cs" />
+    <Compile Include="Common\Functions\Function.cs" />
+    <Compile Include="Common\Other\Attributes.cs" />
+    <Compile Include="Common\Functions\Macros.cs" />
+    <Compile Include="Common\Other\Elements.cs" />
+    <Compile Include="Common\Other\Library.cs" />
+    <Compile Include="Common\Functions\Plugin.cs" />
+    <Compile Include="Macro.cs" />
     <Compile Include="Documents\Document.cs" />
-    <Compile Include="Documents\DocumentStatic.cs" />
-    <Compile Include="Elements\Attribute.cs" />
-    <Compile Include="Elements\AttributeDef.cs" />
+    <Compile Include="Documents\DocumentCommon.cs" />
+    <Compile Include="Documents\DocumentAPIs.cs" />
+    <Compile Include="Attributes\Attribute.cs" />
+    <Compile Include="Attributes\AttributeDefParse.cs" />
     <Compile Include="Elements\Element.cs" />
     <Compile Include="Elements\ElementDef.cs" />
-    <Compile Include="Elements\ElementInfo.cs" />
+    <Compile Include="Elements\ElementContext.cs" />
     <Compile Include="Misc\Enums.cs" />
     <Compile Include="Misc\Exceptions.cs" />
     <Compile Include="Library.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Misc\Utils.cs" />
   </ItemGroup>

@@ -11,7 +11,7 @@ namespace Celeste.Mod.CelesteUI
     /// <summary>
     /// Represents a macro.
     /// </summary>
-    public interface ICUIMacro
+    public interface ICuiMacro
     {
         /// <summary>
         /// Represents the macro's definition name.
@@ -27,16 +27,14 @@ namespace Celeste.Mod.CelesteUI
         /// <value>
         /// The stage the macro should be evaluated in.
         /// </value>
-        CUIStage Stage { get; }
+        CuiStage Stage { get; }
 
         /// <summary>
         /// Evaluates the macro given it's input value and the parent element.
         /// </summary>
-        /// <typeparam name="R">The macro's output type</typeparam>
-        /// <typeparam name="T">The macro's input type</typeparam>
         /// <param name="value">The macro's input value</param>
         /// <param name="element">The element whose attribute contains the macro</param>
         /// <returns>The output value of the macro</returns>
-        R Evaluate<R, T>(T value, CUIElement element);
+        object Evaluate(object value, CuiElement element);
     }
 }

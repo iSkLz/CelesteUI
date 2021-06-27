@@ -5,7 +5,7 @@
  * Element implementation
  * 
  * Author: SkLz
- * Last edit: 20/06/2021
+ * Last edit: 26/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -20,79 +20,71 @@ namespace Celeste.Mod.CelesteUI
     /// Elements are also left to implement their own update methods. It is common for update methods to have the access modifier "protected" and to accept one parameter which is the instance being updated.
     /// Upon activation, it is also common for elements that need updating and define an update method to set their instances to call their update methods. This allows third parties to modify elements and apply changes to the attributes and have the changes visible on the instances without modifying them directly.
     /// </remarks>
-    public abstract class CUIElement
+    public class CuiElement
     {
         /// <summary>
         /// Represents the container document of the element.
         /// </summary>
-        public readonly CUIDocument Document;
+        public CuiDocument Document { get; protected set; }
 
         /// <summary>
-        /// Represents the parent of the element if one exists, and null otherwise.
+        /// Represents the parent of the element if it was retrieved.
         /// </summary>
-        public readonly CUIElement Parent;
+        public CuiElement Parent { get; protected set; }
 
         /// <summary>
-        /// Contains a sorted list of the element's attributes.
+        /// Contains the element's children if they were retrieved.
         /// </summary>
-        protected readonly List<CUIAttribute> Attributes;
+        public List<CuiElement> Children { get; protected set; }
 
         /// <summary>
-        /// Creates a new instance without assigning a document, a parent or a list of attributes.
+        /// Represents the element's identifier is one was specified.
         /// </summary>
-        public CUIElement()
+        public readonly string ID;
+
+        /// <summary>
+        /// Checks whether the element has been assigned an identifier or not.
+        /// </summary>
+        /// <value>
+        /// Whether the element has an identifier or not.
+        /// </value>
+        public bool HasID => ID != null;
+
+        /// <summary>
+        /// Contains the element's attributes.
+        /// </summary>
+        protected readonly CuiAttributesCollection Attributes;
+
+        /// <summary>
+        /// Creates an element with the specified ID and attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes assigned to the element</param>
+        /// <param name="id">The ID of the element or null if none is assigned</param>
+        protected CuiElement(CuiAttributesCollection attributes, string id)
         {
-        }
-
-        /// <summary>
-        /// Creates a new instance and assigns a document and an array of attributes.
-        /// </summary>
-        /// <param name="document">The container document to assign</param>
-        /// <param name="attributes">The array of attributes to assign</param>
-        public CUIElement(CUIDocument document, params CUIAttribute[] attributes)
-            : this(document, new List<CUIAttribute>(attributes))
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance and assigns a parent element and an array of attributes.
-        /// </summary>
-        /// <param name="parent">The container element to assign</param>
-        /// <param name="attributes">The array of attributes to assign</param>
-        public CUIElement(CUIElement parent, params CUIAttribute[] attributes)
-            : this(parent, new List<CUIAttribute>(attributes))
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance and assigns a document and a list of attributes
-        /// </summary>
-        /// <param name="document">The container document to assign</param>
-        /// <param name="attributes">The list of attributes to assign</param>
-        public CUIElement(CUIDocument document, List<CUIAttribute> attributes)
-        {
-            Document = document;
+            ID = id;
             Attributes = attributes;
         }
 
         /// <summary>
-        /// Creates a new instance and assigns a parent element and a list of attributes
+        /// Creates an element with the specified attributes.
         /// </summary>
-        /// <param name="parent">The container element to assign</param>
-        /// <param name="attributes">The list of attributes to assign</param>
-        public CUIElement(CUIElement parent, List<CUIAttribute> attributes)
-            : this(parent.Document, attributes)
+        /// <remarks>
+        /// This automatically resolves the ID from the attributes.
+        /// </remarks>
+        /// <param name="attributes">The attributes assigned to the element</param>
+        public CuiElement(CuiAttributesCollection attributes)
+            : this(attributes, (string)attributes["ID"].Value)
         {
-            Parent = parent;
         }
 
         /// <summary>
-        /// Initializes the element's contents.
+        /// Initializes the element.
         /// </summary>
         /// <remarks>
         /// This is where the element evaluates its creation time attributes and does the rest of the initialization work.
         /// </remarks>
-        public abstract void Initialize();
+        public virtual void Initialize() { }
 
         /// <summary>
         /// Represents an enumerable list of parents starting from this element's parent ending with the root element.
@@ -101,7 +93,7 @@ namespace Celeste.Mod.CelesteUI
         /// If this element is the root element, the resultant enumerable contains 0 items (no iterations).
         /// </remarks>
         /// <returns>An iterator that works its way through the tree of parents.</returns>
-        public IEnumerable<CUIElement> Parents()
+        public IEnumerable<CuiElement> Parents()
         {
             var elem = Parent;
 
