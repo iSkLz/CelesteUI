@@ -8,7 +8,7 @@ using System.Xml;
  * CelesteUI document implementation
  * 
  * Author: SkLz
- * Last edit: 26/06/2021
+ * Last edit: 28/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -41,7 +41,7 @@ namespace Celeste.Mod.CelesteUI
         /// Creates a document from a stream.
         /// </summary>
         /// <param name="stream">The input stream</param>
-        public CuiDocument(Stream stream)
+        public CuiDocument(Stream stream) : this()
         {
             Markup.Load(stream);
             stream.Close();
@@ -51,7 +51,7 @@ namespace Celeste.Mod.CelesteUI
         /// Creates a document from an XML reader.
         /// </summary>
         /// <param name="reader">The XML input.</param>
-        public CuiDocument(XmlReader reader)
+        public CuiDocument(XmlReader reader) : this()
         {
             Markup.Load(reader);
         }
@@ -60,7 +60,7 @@ namespace Celeste.Mod.CelesteUI
         /// Creates a document from an XML markup string.
         /// </summary>
         /// <param name="xml">The XML input.</param>
-        public CuiDocument(string xml)
+        public CuiDocument(string xml) : this()
         {
             Markup.LoadXml(xml);
         }
@@ -69,7 +69,7 @@ namespace Celeste.Mod.CelesteUI
         /// Creates a document from an XML document.
         /// </summary>
         /// <param name="document">The XML input.</param>
-        public CuiDocument(XmlDocument document)
+        public CuiDocument(XmlDocument document) : this()
         {
             Markup = document;
         }
@@ -78,7 +78,7 @@ namespace Celeste.Mod.CelesteUI
         /// Creates a document from an XML element.
         /// </summary>
         /// <param name="root">The XML root element.</param>
-        public CuiDocument(XmlElement root)
+        public CuiDocument(XmlElement root) : this()
         {
             Markup.AppendChild(root);
         }
@@ -90,9 +90,17 @@ namespace Celeste.Mod.CelesteUI
         /// <returns>An indexed dictionary of elements that have an ID assigned to them.</returns>
         public Dictionary<string, CuiElement> Parse()
         {
+            // Initialize/clear lists
             Macros = new Dictionary<string, ICuiMacro>();
             Elements = new Dictionary<string, CuiElementDefinition>();
 
+            // Import auto libraries
+            foreach (var lib in AutoLibraries)
+            {
+                ImportLibrary(lib);
+            }
+
+            // Dictionary for <ID, Element>
             var dict = new Dictionary<string, CuiElement>();
 
             // TODO: Uhhh, what's the capitalization convention for local methods?
@@ -128,7 +136,10 @@ namespace Celeste.Mod.CelesteUI
                 return parsedElement;
             }
 
+            // Start with the root element
             parseElement(Markup.DocumentElement, null);
+
+            // When the call stack of the local methods is done, we've parsed everything
             return dict;
         }
     }

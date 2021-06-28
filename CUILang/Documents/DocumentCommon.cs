@@ -14,7 +14,7 @@ namespace Celeste.Mod.CelesteUI
         static CuiDocument()
         {
             // Add the common library to all documents
-            GlobalLibraries.Add(CuiCommonLibrary.Instance);
+            AutoGlobalLibraries.Add(CuiCommonLibrary.Instance);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace Celeste.Mod.CelesteUI
         /// Constructs an element definition with the specified name and for the specified element type.
         /// </summary>
         /// <param name="name">The definition's XML element name</param>
-        /// <param name="elementType">The element type</typeparam>
+        /// <param name="elementType">The element type</param>
         public CuiElementDefinition(string name, Type elementType) : this(name)
         {
             if (elementType == null)

@@ -7,7 +7,7 @@ using System.Collections.Generic;
  * External APIs
  * 
  * Author: SkLz
- * Last edit: 27/06/2021
+ * Last edit: 28/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -38,6 +38,14 @@ namespace Celeste.Mod.CelesteUI
         /// Add libraries to this list to allow importing them via the import elements.
         /// </remarks>
         public List<CuiLibrary> Libraries = new List<CuiLibrary>();
+
+        /// <summary>
+        /// Contains the libraries imported in each parse.
+        /// </summary>
+        /// <remarks>
+        /// Add libraries to this list to have them imported every parse.
+        /// </remarks>
+        public List<CuiLibrary> AutoLibraries = new List<CuiLibrary>();
 
         /// <summary>
         /// Imports a library directly.
@@ -165,7 +173,7 @@ namespace Celeste.Mod.CelesteUI
 
             foreach (var lib in AutoGlobalLibraries)
             {
-                ImportLibrary(lib);
+                AutoLibraries.Add(lib);
             }
 
             foreach (var plugin in GlobalPlugins)
