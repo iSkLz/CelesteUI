@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
  * Parsing members
  * 
  * Author: SkLz
- * Last edit: 25/06/2021
+ * Last edit: 28/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -79,7 +79,7 @@ namespace Celeste.Mod.CelesteUI
             Match match;
             if ((match = MacroRegex.Match(expression)).Success)
             {
-                macro = match.Captures[1].Value;
+                macro = match.Groups[1].Value;
                 return true;
             }
 
@@ -108,7 +108,7 @@ namespace Celeste.Mod.CelesteUI
             while ((match = MacroRegex.Match(exp)).Success)
             {
                 count++;
-                var macroName = match.Captures[1].Value;
+                var macroName = match.Groups[1].Value;
 
                 // Check if the macro with the parsed name is defined in the document
                 if (!element.Document.Macros.ContainsKey(macroName))
@@ -118,7 +118,7 @@ namespace Celeste.Mod.CelesteUI
                 stack.Push(element.Document.Macros[macroName]);
 
                 // Next iteration check the expression inside this macro
-                exp = match.Captures[2].Value;
+                exp = match.Groups[2].Value;
             }
 
             // The last expression is the expression of the innermost macro

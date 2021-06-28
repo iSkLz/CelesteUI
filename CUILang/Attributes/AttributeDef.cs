@@ -27,7 +27,7 @@ namespace Celeste.Mod.CelesteUI
         /// <remarks>
         /// Contains two capture groups: The first contains the macro's name and the second contains its expression.
         /// </remarks>
-        public static Regex MacroRegex = new Regex(@"(\w+)\((\w+)\)");
+        public static Regex MacroRegex = new Regex(@"(\w+)\(([\s\S]+)\)");
 
         /// <summary>
         /// Defines the parsing behavior of the attribute.

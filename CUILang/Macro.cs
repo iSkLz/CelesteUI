@@ -3,7 +3,7 @@
  * Macro interface implementation
  * 
  * Author: SkLz
- * Last edit: 19/06/2021
+ * Last edit: 28/06/2021
  */
 
 namespace Celeste.Mod.CelesteUI
@@ -32,9 +32,9 @@ namespace Celeste.Mod.CelesteUI
         /// <summary>
         /// Evaluates the macro given it's input value and the parent element.
         /// </summary>
-        /// <param name="value">The macro's input value</param>
+        /// <param name="argument">The macro's input value</param>
         /// <param name="element">The element whose attribute contains the macro</param>
         /// <returns>The output value of the macro</returns>
-        object Evaluate(object value, CuiElement element);
+        object Evaluate(object argument, CuiElement element);
     }
 }
