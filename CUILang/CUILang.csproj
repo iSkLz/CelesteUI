@@ -42,8 +42,9 @@
     <Compile Include="Common\Other\Attributes.cs" />
     <Compile Include="Common\Functions\Macros.cs" />
     <Compile Include="Common\Other\Elements.cs" />
-    <Compile Include="Common\Other\Library.cs" />
+    <Compile Include="Common\Library.cs" />
     <Compile Include="Common\Functions\Plugin.cs" />
+    <Compile Include="Common\Other\GenericMacro.cs" />
     <Compile Include="Macro.cs" />
     <Compile Include="Documents\Document.cs" />
     <Compile Include="Documents\DocumentCommon.cs" />

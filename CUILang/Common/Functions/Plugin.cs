@@ -11,7 +11,7 @@ using System.Collections.Generic;
  * Last edit: 27/06/2021
  */
 
-namespace Celeste.Mod.CelesteUI
+namespace Celeste.Mod.CelesteUI.Common
 {
     /// <summary>
     /// Represents a library that exports functions.

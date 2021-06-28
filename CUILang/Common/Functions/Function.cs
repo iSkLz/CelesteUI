@@ -8,7 +8,7 @@
  * Last edit: 27/06/2021
  */
 
-namespace Celeste.Mod.CelesteUI
+namespace Celeste.Mod.CelesteUI.Common
 {
     // Functions are defined as interfaces rather than delegates so that they can store and accumulate data.
 

@@ -6,7 +6,7 @@
  * Last edit: 27/06/2021
  */
 
-namespace Celeste.Mod.CelesteUI
+namespace Celeste.Mod.CelesteUI.Common
 {
     /// <summary>
     /// Implements the basic features of CUI.

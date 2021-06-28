@@ -7,7 +7,7 @@
  * Last edit: 27/06/2021
  */
 
-namespace Celeste.Mod.CelesteUI
+namespace Celeste.Mod.CelesteUI.Common
 {
     public partial class CuiCommonLibrary : CuiLibrary
     {
